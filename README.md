@@ -1,3 +1,3 @@
-# ml-scratch
+# ML-scratch
 
-## a collection of various deep learning models based on PyTorch for various common deep learning problems
+This is sort of a playground for all things deep learning in PyTorch and (hopefully) serves as a reference/educational resource for model implementations in PyTorch. 
