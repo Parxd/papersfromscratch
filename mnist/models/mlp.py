@@ -1,14 +1,12 @@
 import torch
-import torchvision
-from typing import Tuple
-from ..data.download import download
+from ..data.download import load_data
 
 EPOCHS = 10
 BATCH_SIZE = 32
 IMG_WIDTH = 28
 IMG_HEIGHT = 28
 NUM_CLASSES = 10
-DEST = "./mnist/data"
+ROOT = "./mnist/data"
 
 
 class MLP(torch.nn.Module):
@@ -24,24 +22,10 @@ class MLP(torch.nn.Module):
         return torch.nn.functional.softmax(X)
 
 
-def load_data(root: str) -> Tuple[torch.utils.data.DataLoader]:
-    sets: Tuple[torchvision.datasets.MNIST] = download(root)
-    train_loader = torch.utils.data.DataLoader(
-        dataset=sets[0],
-        batch_size=BATCH_SIZE,
-        shuffle=True
-    )
-    test_loader = torch.utils.data.DataLoader(
-        dataset=sets[1],
-        batch_size=BATCH_SIZE,
-        shuffle=True
-    )
-    return train_loader, test_loader
-
-
 def train():
-    load_data(DEST)
+    train_loader, test_loader = load_data(BATCH_SIZE, ROOT)
     model = MLP()
     criterion = torch.nn.CrossEntropyLoss()
     for epoch in range(EPOCHS):
         ...
+    item = next(iter(train_loader))
