@@ -4,11 +4,14 @@ import torch
 class CNN_small(torch.nn.Module):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.layer1 = torch.nn.Conv2d(1, 3, (2, 2))
-        self.layer2 = torch.nn.AvgPool2d((5, 5), 1, 1)
-        self.layer3 = torch.nn.Conv2d(3, 1, (3, 3))
-        self.layer4 = torch.nn.MaxPool2d((5, 5), 1, 1)
-        self.layer5 = torch.nn.Conv2d(1, 1, (8, 8))
+        self.layer1 = torch.nn.Conv2d(in_channels=1, out_channels=16, kernel_size=2)
+        self.layer2 = torch.nn.MaxPool2d(kernel_size=5, stride=1, padding=1)
+        
+        self.layer3 = torch.nn.Conv2d(in_channels=16, out_channels=1, kernel_size=3)
+        self.layer4 = torch.nn.MaxPool2d(kernel_size=5, stride=1, padding=1)
+        
+        self.layer5 = torch.nn.Conv2d(in_channels=1, out_channels=1, kernel_size=8)
+    
         self.layer6 = torch.nn.Linear(196, 50)
         self.layer7 = torch.nn.Linear(50, 10)
 
