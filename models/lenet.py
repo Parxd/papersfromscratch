@@ -59,19 +59,21 @@ C4: 2D convolution
 S5: 2D sub-sample
 
 """
-
 import torch
 from typing import Tuple
 
 
+A = 1.7159
+
+
 # custom pooling layer, basically an avg. pool but with parameters
 class Subsample(torch.nn.Module):
-    def __init__(self, kernel_size: int | Tuple, stride: int, padding: int = 0, *args, **kwargs) -> None:
+    def __init__(self, kernel_size: int | Tuple, stride: int = None, padding: int = 0, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.w = torch.rand(1, requires_grad=True)
         self.b = torch.rand(1, requires_grad=True)
         self.spatial_extent = kernel_size if isinstance(kernel_size, Tuple) else (kernel_size, kernel_size)
-        self.stride = stride
+        self.stride = self.spatial_extent if stride is None else stride
         self.padding = padding
 
     def forward(self, X):
@@ -88,21 +90,30 @@ class LeNet5(torch.nn.Module):
                                   kernel_size=5,
                                   stride=1)
 
-        self.s2 = Subsample(kernel_size=2, stride=2)
+        self.s2 = Subsample(kernel_size=2)
         
         self.c3 = torch.nn.Conv2d(in_channels=6,
                                   out_channels=16,
                                   kernel_size=5,
                                   stride=1)
         
-        self.s4 = Subsample(kernel_size=2, stride=2)
+        self.s4 = Subsample(kernel_size=2)
         
-        self.c5 = torch.nn.Linear()
-        
+        self.c5 = torch.nn.Linear(400, 120)
+        self.f6 = torch.nn.Linear(120, 84)
+        self.f7 = torch.nn.Linear(84, 10)
+
     def forward(self, X):
+        batch_num = X.shape[0]
         X = self.c1(X)
         X = self.s2(X)
         X = self.c3(X)
         X = self.s4(X)
+        X = X.reshape(batch_num, 1, 400)
         X = self.c5(X)
+        X = A * torch.nn.functional.tanh(X)
+        X = self.f6(X)
+        X = A * torch.nn.functional.tanh(X)
+        X = self.f7(X)
         return X
+ 
