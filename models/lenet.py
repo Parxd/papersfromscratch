@@ -70,13 +70,13 @@ class Subsample(torch.nn.Module):
         super().__init__(*args, **kwargs)
         self.w = torch.rand(1, requires_grad=True)
         self.b = torch.rand(1, requires_grad=True)
-        self.spatial_extent = kernel_size[0] if isinstance(kernel_size, Tuple) else kernel_size
+        self.spatial_extent = kernel_size if isinstance(kernel_size, Tuple) else (kernel_size, kernel_size)
         self.stride = stride
         self.padding = padding
 
     def forward(self, X):
         avg = torch.nn.functional.avg_pool2d(X, self.spatial_extent, self.stride, self.padding)
-        return self.w * (avg * self.spatial_extent ** 2) + self.b
+        return self.w * (avg * self.spatial_extent[0] * self.spatial_extent[1]) + self.b
 
 
 class LeNet5(torch.nn.Module):
@@ -97,9 +97,12 @@ class LeNet5(torch.nn.Module):
         
         self.s4 = Subsample(kernel_size=2, stride=2)
         
+        self.c5 = torch.nn.Linear()
+        
     def forward(self, X):
         X = self.c1(X)
         X = self.s2(X)
         X = self.c3(X)
         X = self.s4(X)
+        X = self.c5(X)
         return X
