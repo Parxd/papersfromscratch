@@ -20,12 +20,12 @@ General output feature map shape calculations (from https://cs231n.github.io/con
 
 LeNet-5 layers
 --------------
-I1: Input layer
+I: Input layer
     - W: 32
     - H: 32
     - D: 1
 
-C2: 2D convolution
+C1: 2D convolution
     - Input filters: 1 (greyscale inputs)
     - Output filters: 6
     - Spatial extent: 5
@@ -37,7 +37,7 @@ C2: 2D convolution
         - H = ((32 - 5 * 2(0)) / 1) + 1 = 28
         - D = 6
 
-S3: 2D sub-sample
+S2: 2D sub-sample
     - Input filters: 6
     - Output filters: 6
     - Spatial extent: 2
@@ -49,14 +49,18 @@ S3: 2D sub-sample
         - H = ((28 - 2) / 2) + 1 = 14
         - D = 6
 
-C4: 2D convolution
+C3: 2D convolution
     - Input filters: 6
     - Output filters: 16
     - Spatial extent: 5
     - Stride: 1
     - Padding: 0
 
-S5: 2D sub-sample
+S4: 2D sub-sample
+
+C5: FC-layer 400 x 120
+F6: FC-layer 120 x 84
+F7: FC-layer 84 x 10
 
 """
 import torch
@@ -70,8 +74,8 @@ A = 1.7159
 class Subsample(torch.nn.Module):
     def __init__(self, kernel_size: int | Tuple, stride: int = None, padding: int = 0, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.w = torch.rand(1, requires_grad=True)
-        self.b = torch.rand(1, requires_grad=True)
+        self.w = torch.nn.Parameter(torch.rand(1))
+        self.b = torch.nn.Parameter(torch.rand(1))
         self.spatial_extent = kernel_size if isinstance(kernel_size, Tuple) else (kernel_size, kernel_size)
         self.stride = self.spatial_extent if stride is None else stride
         self.padding = padding
